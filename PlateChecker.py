@@ -56,7 +56,7 @@ while True:
                 if confirmation["result"] == True:
                     # catch errors in confirmation post
                     try:
-                        confirm = requests.post(confirm_url, data = plate)
+                        confirm = requests.post(confirm_url, json = plate)
                     except:
                         print("error for license plate number: " + potential_plates[i])
                         break
