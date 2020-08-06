@@ -52,7 +52,7 @@ while True:
                 check = requests.post(check_url, data = json_plate)
                 # convert response to a python boolean
                 x = check.json()
-                confirmation = json.loads(x)
+                confirmation = json.load(x)
                 
                 if confirmation["result"] == True:
                     try:
