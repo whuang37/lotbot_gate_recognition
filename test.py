@@ -1,11 +1,5 @@
 import json
+import requests
 
-dict = {"result": True}
-
-x = json.dumps(dict)
-
-y = json.loads(x)
-print(y["result"])
-
-if json.loads(x)["result"] == True:
-    print('works')
+add_reservation = "https://parking.wtf/api/add-reservation"
+add = requests.post(add_reservation, json = {"phoneNumber": "9499107797", "plateNumber": "6RUX251"})

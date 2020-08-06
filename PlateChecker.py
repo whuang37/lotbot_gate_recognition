@@ -51,14 +51,14 @@ while True:
                 json_plate = json.dumps({"plateNumber": potential_plates[i]})
                 check = requests.post(check_url, data = json_plate)
                 # convert response to a python boolean
-                confirmation = json.loads(check.json())["result"]
+                confirmation = json.loads(check.json())
                 
-                if confirmation == True: 
+                if confirmation["result"] == True:
                     try:
                         confirm = requests.post(confirm_url, data = json_plate)
-                        gate()
-                        last_seen = potential_plates[i]
                     except:
                         print("error for license plate number: " + potential_plates[i])
-                        
-
+                        break
+                    gate()
+                    last_seen = potential_plates[i]
+                    break
