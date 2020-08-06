@@ -54,6 +54,11 @@ while True:
                 confirmation = json.loads(check.json())["result"]
                 
                 if confirmation == True: 
-                    confirm = requests.post(confirm_url, data = json_plate)
-                    gate()
+                    try:
+                        confirm = requests.post(confirm_url, data = json_plate)
+                        gate()
+                        last_seen = potential_plates[i]
+                    except:
+                        print("error for license plate number: " + potential_plates[i])
+                        
 
