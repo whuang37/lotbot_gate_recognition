@@ -3,6 +3,23 @@ import json
 import subprocess
 import sys
 import requests
+import RPi.GPIO as GPIO
+from time import sleep
+
+GPIO.cleanup()
+
+in1 = 24
+in2 = 23
+en = 25
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(in1,GPIO.OUT)
+GPIO.setup(in2,GPIO.OUT)
+GPIO.setup(en,GPIO.OUT)
+GPIO.output(in1,GPIO.LOW)
+GPIO.output(in2,GPIO.LOW)
+p=GPIO.PWM(en,1000)
+p.start(25)
 
 def scan():
     # change definitions to define parameters of openalpr
@@ -28,12 +45,21 @@ def scan():
         return candidates
     alpr.unload()
 
-def gate(): 
-    print("works")
+def gate(x): 
+    GPIO.output(in1,GPIO.HIGH)
+    GPIO.output(in2,GPIO.LOW)
+    sleep(x)
+    GPIO.output(in1, GPIO.LOW)
+    sleep(1)
+    GPIO.output(in1,GPIO.LOW)
+    GPIO.output(in2,GPIO.HIGH)
+    sleep(x)
+    GPIO.output(in2, GPIO.LOW)
     
 last_seen = ""
 check_url = "https://parking.wtf/api/check-reservation"
 confirm_url = "https://parking.wtf/api/confirm-reservation"
+
 
 while True:
     potential_plates = scan()
@@ -61,6 +87,6 @@ while True:
                         print("error for license plate number: " + potential_plates[i])
                         print(e)
                         break
-                    gate()
+                    gate(5)
                     last_seen = potential_plates[i]
                     break
