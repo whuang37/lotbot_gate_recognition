@@ -21,7 +21,6 @@ def scan():
     
     # checks if there is car in frame else returns 
     if len(plates['results']) == 0:
-        print("no car found")
         return 
     else:
         # return the top 3 candidates
@@ -40,23 +39,24 @@ while True:
     potential_plates = scan()
     
     if not potential_plates:
+        print("no car found")
         continue
     else:
         # loops for each potential candidate
         for i in range(len(potential_plates)):
             
             if potential_plates[i] == last_seen:
-                continue
+                break
             else:
-                json_plate = json.dumps({"plateNumber": potential_plates[i]})
-                check = requests.post(check_url, data = json_plate)
+                print(potential_plates[i])
+                plate = {"plateNumber": potential_plates[i]}
+                check = requests.post(check_url, json = plate)
                 # convert response to a python boolean
-                x = check.json()
-                confirmation = json.load(x)
-                
+                confirmation = check.json()
                 if confirmation["result"] == True:
+                    # catch errors in confirmation post
                     try:
-                        confirm = requests.post(confirm_url, data = json_plate)
+                        confirm = requests.post(confirm_url, data = plate)
                     except:
                         print("error for license plate number: " + potential_plates[i])
                         break
