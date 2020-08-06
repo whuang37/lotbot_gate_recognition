@@ -5,9 +5,11 @@ import sys
 import requests
 
 def scan():
+    # change definitions to define parameters of openalpr
     location = "us"
     config_path = "/etc/openalpr/openalpr.conf"
     runtime_path = "/home/pi/openalpr/runtime_data/"
+    
     #subprocess.call("fswebcam -r 1920x1080 -S 20 --set brightness=50% --no-banner /home/pi/Desktop/BruinLabsParking/license_plate.jpg", shell=True)
     
     alpr = Alpr(location, config_path, runtime_path)
@@ -17,10 +19,12 @@ def scan():
     
     plates = alpr.recognize_file("license_plate.jpg")
     
+    # checks if there is car in frame else returns 
     if len(plates['results']) == 0:
         print("no car found")
         return 
     else:
+        # return the top 3 candidates
         candidates = [plates['results'][0]['candidates'][i]['plate'] for i in range(0,3)]
         return candidates
     alpr.unload()
@@ -38,12 +42,15 @@ while True:
     if not potential_plates:
         continue
     else:
+        # loops for each potential candidate
         for i in range(len(potential_plates)):
+            
             if potential_plates[i] == last_seen:
                 continue
             else:
                 json_plate = json.dumps({"plateNumber": potential_plates[i]})
                 check = requests.post(check_url, data = json_plate)
+                # convert response to a python boolean
                 confirmation = json.loads(check.json())["result"]
                 
                 if confirmation == True: 
