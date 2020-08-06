@@ -51,7 +51,8 @@ while True:
                 json_plate = json.dumps({"plateNumber": potential_plates[i]})
                 check = requests.post(check_url, data = json_plate)
                 # convert response to a python boolean
-                confirmation = json.loads(check.json())
+                x = check.json()
+                confirmation = json.loads(x)
                 
                 if confirmation["result"] == True:
                     try:
