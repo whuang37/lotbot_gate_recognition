@@ -57,8 +57,9 @@ while True:
                     # catch errors in confirmation post
                     try:
                         confirm = requests.post(confirm_url, json = plate)
-                    except:
+                    except Exception as e:
                         print("error for license plate number: " + potential_plates[i])
+                        print(e)
                         break
                     gate()
                     last_seen = potential_plates[i]
