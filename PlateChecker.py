@@ -5,31 +5,48 @@ import sys
 import requests
 
 def scan():
+    location = "us"
+    config_path = "/etc/openalpr/openalpr.conf"
+    runtime_path = "/home/pi/openalpr/runtime_data/"
     #subprocess.call("fswebcam -r 1920x1080 -S 20 --set brightness=50% --no-banner /home/pi/Desktop/BruinLabsParking/license_plate.jpg", shell=True)
     
-    alpr = Alpr("us", "/etc/openalpr/openalpr.conf", "/home/pi/openalpr/runtime_data/")
+    alpr = Alpr(location, config_path, runtime_path)
     if not alpr.is_loaded():
         print("Failed to load OpenALPR")
         sys.exit()
     
     plates = alpr.recognize_file("license_plate.jpg")
     
-    if len(plates['results']) != 0:
+    if len(plates['results']) == 0:
+        print("no car found")
+        return 
+    else:
         candidates = [plates['results'][0]['candidates'][i]['plate'] for i in range(0,3)]
         return candidates
-    else:
-        print("no car found")
-    
     alpr.unload()
 
+def gate(): 
+    print("works")
+    
 last_seen = ""
+check_url = "https://parking.wtf/api/check-reservation"
+confirm_url = "https://parking.wtf/api/confirm-reservation"
+
 while True:
     potential_plates = scan()
     
-    if potential_plates[0] == last_seen:
+    if not potential_plates:
         continue
     else:
-        json_plates = json.dumps(potential_plates)
-        x = requests.post(url, json = json_plates
-        
-scan()
+        for i in range(len(potential_plates)):
+            if potential_plates[i] == last_seen:
+                continue
+            else:
+                json_plate = json.dumps({"plateNumber": potential_plates[i]})
+                check = requests.post(check_url, data = json_plate)
+                confirmation = json.loads(check.json())["result"]
+                
+                if confirmation == True: 
+                    confirm = requests.post(confirm_url, data = json_plate)
+                    gate()
+
