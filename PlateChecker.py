@@ -5,6 +5,7 @@ import sys
 import requests
 import RPi.GPIO as GPIO
 from time import sleep
+import logging
 
 location = "us"
 config_path = "/etc/openalpr/openalpr.conf"
@@ -58,6 +59,8 @@ last_seen = ""
 check_url = "https://parking.wtf/api/check-reservation"
 confirm_url = "https://parking.wtf/api/confirm-reservation"
 
+logging.basicConfig(filename = "cars.log", filemode = "a", format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level = logging.DEBUG)
+
 while True:
     potential_plates = scan()
     
@@ -87,7 +90,10 @@ while True:
                     gate()
                     last_seen = potential_plates[i]
                     print(potential_plates[i] + " has entered")
+                    logging.info(potential_plates[i] + "entered")
                     break
+                elif i == len(potential_plates) and confirmation["result"] == False:
+                    logging.info(potential_plates[0] + "denied")
                 else: 
                     print(potential_plates[i] + " has been denied")
     
