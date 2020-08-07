@@ -21,11 +21,16 @@ GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
 p.start(25)
 
+location = "us"
+config_path = "/etc/openalpr/openalpr.conf"
+runtime_path = "/home/pi/openalpr/runtime_data/"
+last_seen = ""
+check_url = "https://parking.wtf/api/check-reservation"
+confirm_url = "https://parking.wtf/api/confirm-reservation"
+
+
 def scan():
     # change definitions to define parameters of openalpr
-    location = "us"
-    config_path = "/etc/openalpr/openalpr.conf"
-    runtime_path = "/home/pi/openalpr/runtime_data/"
     
     #subprocess.call("fswebcam -r 1920x1080 -S 20 --set brightness=50% --no-banner /home/pi/Desktop/BruinLabsParking/license_plate.jpg", shell=True)
     
@@ -45,7 +50,8 @@ def scan():
         return candidates
     alpr.unload()
 
-def gate(x): 
+def gate(x):
+
     GPIO.output(in1,GPIO.HIGH)
     GPIO.output(in2,GPIO.LOW)
     sleep(x)
@@ -56,10 +62,6 @@ def gate(x):
     sleep(x)
     GPIO.output(in2, GPIO.LOW)
     
-last_seen = ""
-check_url = "https://parking.wtf/api/check-reservation"
-confirm_url = "https://parking.wtf/api/confirm-reservation"
-
 
 while True:
     potential_plates = scan()
@@ -89,4 +91,13 @@ while True:
                         break
                     gate(5)
                     last_seen = potential_plates[i]
+                    print(potential_plates[i] + " has entered")
                     break
+                else: 
+                    print(potential_plates[i] + " has been denied")
+    
+    x = str(input())
+    if x == exit:
+        sys.exit()
+        GPIO.cleanup()
+                
