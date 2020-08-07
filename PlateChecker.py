@@ -6,7 +6,9 @@ import requests
 import RPi.GPIO as GPIO
 from time import sleep
 
-GPIO.cleanup()
+location = "us"
+config_path = "/etc/openalpr/openalpr.conf"
+runtime_path = "/home/pi/openalpr/runtime_data/"
 
 in1 = 24
 in2 = 23
@@ -21,18 +23,12 @@ GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
 p.start(25)
 
-location = "us"
-config_path = "/etc/openalpr/openalpr.conf"
-runtime_path = "/home/pi/openalpr/runtime_data/"
-last_seen = ""
-check_url = "https://parking.wtf/api/check-reservation"
-confirm_url = "https://parking.wtf/api/confirm-reservation"
 
 
 def scan():
     # change definitions to define parameters of openalpr
     
-    #subprocess.call("fswebcam -r 1920x1080 -S 20 --set brightness=50% --no-banner /home/pi/Desktop/BruinLabsParking/license_plate.jpg", shell=True)
+    subprocess.call("fswebcam -r 1920x1080 -S 20 --set brightness=50% --no-banner /home/pi/Desktop/BruinLabsParking/license_plate.jpg", shell=True)
     
     alpr = Alpr(location, config_path, runtime_path)
     if not alpr.is_loaded():
@@ -50,18 +46,17 @@ def scan():
         return candidates
     alpr.unload()
 
-def gate(x):
-
-    GPIO.output(in1,GPIO.HIGH)
-    GPIO.output(in2,GPIO.LOW)
-    sleep(x)
-    GPIO.output(in1, GPIO.LOW)
-    sleep(1)
-    GPIO.output(in1,GPIO.LOW)
-    GPIO.output(in2,GPIO.HIGH)
-    sleep(x)
-    GPIO.output(in2, GPIO.LOW)
+def gate():
+    for i in range(3): 
+        GPIO.output(in1,GPIO.HIGH)
+        GPIO.output(in2,GPIO.LOW)
+        sleep(.5)
+        GPIO.output(in1, GPIO.LOW)
+        sleep(.5)
     
+last_seen = ""
+check_url = "https://parking.wtf/api/check-reservation"
+confirm_url = "https://parking.wtf/api/confirm-reservation"
 
 while True:
     potential_plates = scan()
@@ -89,7 +84,7 @@ while True:
                         print("error for license plate number: " + potential_plates[i])
                         print(e)
                         break
-                    gate(5)
+                    gate()
                     last_seen = potential_plates[i]
                     print(potential_plates[i] + " has entered")
                     break
