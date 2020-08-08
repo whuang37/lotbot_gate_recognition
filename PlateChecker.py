@@ -60,7 +60,10 @@ last_seen = ""
 check_url = "https://parking.wtf/api/check-reservation"
 confirm_url = "https://parking.wtf/api/confirm-reservation"
 
-logging.basicConfig(filename = "cars.log", filemode = "a", format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level = logging.DEBUG)
+logging.basicConfig(filename = "cars.log",
+                    filemode = "a", format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level = logging.DEBUG)
 
 while True:
     potential_plates = scan()
@@ -80,6 +83,7 @@ while True:
                 check = requests.post(check_url, json = plate)
                 # convert response to a python boolean
                 confirmation = check.json()
+                
                 if confirmation["result"] == True:
                     # catch errors in confirmation post
                     try:
@@ -96,9 +100,3 @@ while True:
                 elif i == len(potential_plates)-1 and confirmation["result"] == False:
                     logging.info(potential_plates[0] + " denied")
                     print(potential_plates[0] + " has been denied")
-    
-   # x = str(input())
-   # if x == exit:
-       # sys.exit()
-       # GPIO.cleanup()
-                
