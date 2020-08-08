@@ -1,3 +1,4 @@
+
 from openalpr import Alpr
 import json
 import subprocess
@@ -22,7 +23,7 @@ GPIO.setup(en,GPIO.OUT)
 GPIO.output(in1,GPIO.LOW)
 GPIO.output(in2,GPIO.LOW)
 p=GPIO.PWM(en,1000)
-p.start(25)
+p.start(100)
 
 
 
@@ -90,15 +91,14 @@ while True:
                     gate()
                     last_seen = potential_plates[i]
                     print(potential_plates[i] + " has entered")
-                    logging.info(potential_plates[i] + "entered")
+                    logging.info(potential_plates[i] + " entered")
                     break
-                elif i == len(potential_plates) and confirmation["result"] == False:
-                    logging.info(potential_plates[0] + "denied")
-                else: 
-                    print(potential_plates[i] + " has been denied")
+                elif i == len(potential_plates)-1 and confirmation["result"] == False:
+                    logging.info(potential_plates[0] + " denied")
+                    print(potential_plates[0] + " has been denied")
     
-    x = str(input())
-    if x == exit:
-        sys.exit()
-        GPIO.cleanup()
+   # x = str(input())
+   # if x == exit:
+       # sys.exit()
+       # GPIO.cleanup()
                 
